@@ -1,0 +1,2 @@
+P1	P2	P3	Dstatistic	Z-score	p-value	f4-ratio	clustering_KS_p-val1	clustering_KS_p-val2	BBAA	ABBA	BABA
+vill	brac	alle	0.0143893	1.61577	0.106144	0.0968291	0.000561244	0.475943	43184.2	46601.9	45279.8
