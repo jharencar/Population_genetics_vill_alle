@@ -14,21 +14,6 @@ theme:
   dark: superhero
 ---
 
-## Quarto
-
-Note: This is a quarto file. Quarto enables you to weave together content and executable code into a finished document. [Learn more about Quarto here](https://quarto.org)
-
-The below chunk will not be displayed when rendering - good for opening packages\
-\
-(GREAT PACKAGES TO LOOK INTO! plotly, interactive ggplots with ggplotly! leaflet() interactive maps and more!!)\
-can do in line code that actually runs! eg:
-
-```{r}
-c=2+3
-```
-
-The value of c is `r c` - great for printing p-vals, or other saved values
-
 ```{r}
 #| echo: false
 library(ggplot2)
@@ -61,24 +46,23 @@ PCAngsd run on beagle file from angsd1 (samtools; see 'ANGSD run tracking - full
 `python pcangsd.py -beagle $IN_DIR/selected_sites_0.05co_AVH.genolike.beagle.gz -o $OUT_DIR/sites_0.15co_AVH_2_PCAngsd`
 
 ```{r full_angsd1_AVH_PCA, echo=FALSE}
-## Need to re-visit: includes less than 0.05 cutoff samples, but not sure that is bad
-AVHpop <- read.table("angsd_out/AVH_clean_211104.pop.info")
-cov <- as.matrix(read.table("angsd_out/PCAngsd/sites_0.05co_AVH_2_PCAngsd.cov"))
+AVHF1pop <- read.table("angsd_out/AHVF1_231220.pop.info")
+cov <- as.matrix(read.table("angsd_out/PCAngsd/AHVF1_231220.PCAngsd.cov"))
 e <- eigen(cov)
 
 PC1 <- e$vectors[,1]
 PC2 <- e$vectors[,2]
-spp <- AVHpop[,2]
-ID <- AVHpop[,1]
-PC12.AVH1.co0.15 <- data.frame(PC1, PC2, ID, spp)
+spp <- AVHF1pop[,2]
+ID <- AVHF1pop[,1]
+PC12.AVHF1.co0.15 <- data.frame(PC1, PC2, ID, spp)
 
-ggplot(PC12.AVH1.co0.15, aes(x=PC1, y=PC2, fill=spp)) +
+ggplot(PC12.AVHF1.co0.15, aes(x=PC1, y=PC2, fill=spp)) +
   geom_point(size = 3, pch = 21, colour="black") +
-  scale_fill_manual(values=c("#CC79A7", "#56B4E9", "#F0E442"), name=paste("Field called \n species"), labels=c(expression(italic("C. allenii")), "hybrid", expression(italic("C. villosissimus")))) +
+  scale_fill_manual(values=c("#CC79A7", "#93c572","#56B4E9", "#F0E442"), name=paste("Species"), labels=c(expression(italic("C. allenii")), "F1","hybrid", expression(italic("C. villosissimus")))) +
   scale_x_reverse() +
   theme_bw() +
   theme(legend.text.align = 0) + 
-  geom_text_repel(aes(label=ID), size =3, nudge_y = 0.03)
+  geom_text_repel(aes(label=ID), size =1.5, nudge_y = 0.03, max.overlaps = 30)
 #ggtitle("AVH1.selected.sites.co0.15x") +
 #geom_text_repel(aes(label=ID), size =3, nudge_y = 0.03)
  

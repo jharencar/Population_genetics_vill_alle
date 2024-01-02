@@ -1,0 +1,9 @@
+Input: lname=/hb/groups/kay_lab/Julia_popgen/ANGSD/angsd_in/AHVF1_231220.beagle.gz nPop=2, fname=(null) qname=(null) outfiles=/hb/groups/kay_lab/Julia_popgen/ANGSD/NGSadmix_out/AHVF1_231220.NGSadmix
+Setup: seed=1703110454 nThreads=48 method=1
+Convergence: maxIter=2000 tol=0.000010 tolLike50=0.100000 dymBound=0
+Filters: misTol=0.050000 minMaf=0.050000 minLrt=0.000000 minInd=0
+Input file has dim: nsites=19098 nind=61
+Input file has dim (AFTER filtering): nsites=15785 nind=61
+	[ALL done] cpu-time used =  46.72 sec
+	[ALL done] walltime used =  5.00 sec
+best like=-697658.396248 after 331 iterations
