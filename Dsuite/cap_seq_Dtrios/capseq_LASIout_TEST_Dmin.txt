@@ -1,0 +1,5 @@
+P1	P2	P3	Dstatistic	Z-score	p-value	f4-ratio	BBAA	ABBA	BABA
+C.bracteatus	C.villosissimus	C.allenii	0.103734	1.24477	0.213216	0.036075	31.5	66.5	54
+C.bracteatus	XXX	C.allenii	0.114754	1.36949	0.170845	0.040404	34	68	54
+C.villosissimus	XXX	C.allenii	0.2	0.447214	0.654721	0.00449102	296.5	4.5	3
+C.villosissimus	XXX	C.bracteatus	0.454545	1.13636	0.255804	0.0124378	330	4	1.5

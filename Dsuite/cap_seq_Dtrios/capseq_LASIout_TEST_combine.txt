@@ -1,0 +1,4 @@
+C.allenii	C.bracteatus	C.villosissimus	54	66.5	31.5	346	173	334	381	201	346.5
+C.allenii	C.bracteatus	XXX	54	68	34	376.5	173	332.5	410.5	198.5	346.5
+C.allenii	C.villosissimus	XXX	3	4.5	296.5	376.5	346	332.5	84.5	52.5	334
+C.bracteatus	C.villosissimus	XXX	1.5	4	330	410.5	381	198.5	84.5	52.5	201

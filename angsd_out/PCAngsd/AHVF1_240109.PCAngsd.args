@@ -1,0 +1,6 @@
+PCAngsd v.1.0
+Time: 19/01/2024 14:02:33
+Directory: /hb/groups/kay_lab/Julia_popgen/ANGSD
+Options:
+	-beagle /hb/groups/kay_lab/Julia_popgen/ANGSD/angsd_in/AHVF1_240109.beagle.gz
+	-out /hb/groups/kay_lab/Julia_popgen/ANGSD/PCAngsd_out/AHVF1_240109.PCAngsd
