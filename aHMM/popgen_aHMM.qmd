@@ -1,0 +1,66 @@
+---
+title: "popgen_aHMM_hybrid_ancestry"
+author: "Julia Harenčár"
+date: "01/27/2024"
+format: 
+  html:
+    code-fold: true
+    code-tools: true
+    code-overflow: wrap
+    toc: true
+    number-sections: true
+theme:
+  light: minty
+  dark: superhero
+editor_options: 
+  chunk_output_type: console
+---
+
+## Local ancestry assignment in wild population samples
+
+```{r load packages, echo=FALSE}
+library(readr)
+library("ggplot2")
+library(dplyr)
+theme_set(theme_bw())
+```
+
+### AncestryInfer aHMM
+
+These results were generated with the old/original python file from Max Genetti (in github directory as "OG_vcf2aHMM.py").
+
+Test on Chromosome 1 only, and with a subset of esp *C. allenii* parents:
+
+```{r}
+## 240206 aHMM test - new params
+# vcf2aHMM parameters:
+# --rate 1 --minGT 1 --minDif .1 --dist 1000 --minDP 1
+# aHMM parameters:
+# -a 2 0.5 0.5 -p 0 100000 0.5 -p 1 2 0.5 -e 1e-3
+
+H_19.516 <- read_tsv("aHMM/19.516.posterior.tsv")
+names(H_19.516) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+H_19.516_0.9co <- H_19.516 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) 
+H_19.516_0.9co <- H_19.516_0.9co %>% mutate (ancestry = ref_homo+het*0.5)
+ggplot(H_19.516_0.9co, aes(position, ancestry)) + 
+  ggtitle("H_19.516 (--rate 1 --minGT 1 --minDif .1 --dist 1000 --minDP 1)") +
+  geom_point() +
+  ylim(0,1)
+ggsave("aHMM/H_19.516_ch1_test2_aHMM_plot.pdf", units = "mm", width = 250, height = 125)
+
+## 240117 aHMM test 
+# vcf2aHMM parameters:
+# --rate 2 --minGT 1 --minDif .8 --dist 1000 --minDP .5
+# aHMM parameters:
+# -a 2 0.5 0.5 -p 0 100000 0.5 -p 1 10 0.5 -e 1e-3
+
+test1_H_19.516 <- read_tsv("aHMM/ch1_test1_19.516.posterior.tsv")
+names(test1_H_19.516) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+H_19.516_0.9co <- test1_H_19.516 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) 
+H_19.516_0.9co <- H_19.516_0.9co %>% mutate (ancestry = ref_homo+het*0.5)
+ggplot(H_19.516_0.9co, aes(position, ancestry)) + 
+  ggtitle("H_19.516 (--rate 2 --minGT 1 --minDif .8 --dist 1000 --minDP .5)") +
+  geom_point() +
+  ylim(0,1)
+ggsave("aHMM/H_19.516_ch1_test1_aHMM_plot.pdf", units = "mm", width = 250, height = 125)
+```
