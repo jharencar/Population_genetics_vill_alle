@@ -15,6 +15,37 @@ theme:
 editor_options: 
   chunk_output_type: console
 ---
+## Heterozygosity estimates
+Claculating heterozygosity from an ANGSD generated SFS for just chromosome one of alle and vill to get rough idea of how diversity compares between spp.
+Takeaway -> I don't think I can trust the absolute values and would want to do whole genome, also, sig diff number 'items' (sites I imagine) btw spp bc more alle than vill bams, so lower heteroz. of vill may just be because of that. All that said, it is clear I have greater representation of diersity in alle and it makes sense to subset alle for aHMM.
+
+```{bash}
+# quick angsd heterozygosity estimation 
+# folded - unsure of ancestral state 
+angsd -bam Aonly_bam.filelist -anc /hb/groups/kay_lab/genomes/C.lasius_genome_NCBI.fasta -dosaf 1 -gl 1 -C 50 -ref /hb/groups/kay_lab/genomes/C.lasius_genome_NCBI.fasta -minQ 20 -minmapq 20 -r Chrom1 -out alle_angsdput
+
+#followed by the actual estimation
+realSFS alle_angsdput.saf.idx >ALLE_est.ml
+```
+```{r}
+# calculate heterozygosity
+a <- scan("ANGSD/SFS_heterozygosity/ALLE_est.ml")
+a[2]/sum(a) # 0.00305178
+```
+
+```{bash}
+# quick angsd heterozygosity estimation 
+# folded - unsure of ancestral state 
+angsd -bam Vonly_bam.filelist -anc /hb/groups/kay_lab/genomes/C.lasius_genome_NCBI.fasta -dosaf 1 -gl 1 -C 50 -ref /hb/groups/kay_lab/genomes/C.lasius_genome_NCBI.fasta -minQ 20 -minmapq 20 -r Chrom1 -out vill_angsdput
+
+# followed by the actual estimation
+realSFS vill_angsdput.saf.idx >VILL_est.ml
+```
+```{r}
+# calculate heterozygosity
+v <- scan("ANGSD/SFS_heterozygosity/VILL_est.ml")
+v[2]/sum(v) # 0.0002040093
+```
 
 ## Local ancestry assignment in wild population samples
 
