@@ -82,14 +82,15 @@ misperforming_sites_unique <- misperforming_sites %>%
   arrange(chrom, position)
 
 ## Count the number of misperforming sites per chromosome
-nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom1",]) #(KAU-73), 268
-nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom2",]) #0 , 551
-nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom3",]) #0 , 685
-nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom4",]) #0 , 376
-nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom5",]) #0 , 767
-nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom6",]) #533, 0
-nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom8",]) #160, 1,751 (has 19,321 sites total...)
-nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom9",]) #92, 496
+nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom1",]) #(KAU-73), 268 (27014, 26746)
+nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom2",]) #0 , 551 (30552, 30001)
+nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom3",]) #0 , 685 (21082, 20397)
+nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom4",]) #0 , 376 (18308, 17932)
+nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom5",]) #0 , 767 (25374, 24607)
+nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom6",]) #533, 0 (19823,19823)
+nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom7",]) #XX, 459 (17887, 17428)
+nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom8",]) #160, 1,751 (19321, 17570)
+nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom9",]) #92, 496 (17508, 17012)
 
 
 ## Plotting functions in case you need to investigate... 
@@ -114,5 +115,5 @@ for (i in 1:length(posterior_directories)) {
   anti_join(misperforming_sites_unique, by = c("V1" = "chrom", "V2" = "position"))
   assign(panel_name, filtered_panel)
   file_name <- paste0("chr", i, "_filtered.panel")
-  write.table(get(paste0("panel_chr", i)), file = file_name, sep = "\t", row.names = FALSE)
+  write.table(get(paste0("panel_chr", i)), file = file_name, sep = "\t", row.names = FALSE, col.names=FALSE)
 }
