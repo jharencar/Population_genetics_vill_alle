@@ -23,6 +23,8 @@ library(ggrepel)
 library(patchwork)
 library(dplyr)
 library(tidyverse)
+library(readr)
+theme_set(theme_bw())
 ```
 
 author: "Julia Harenčár" date: "5/2/2022" output: html_document
@@ -204,7 +206,51 @@ ggplot(PC12.LGVHA.co0.15X, aes(x=PC1, y=PC2)) +
 #  geom_text_repel(aes(label=sample.id), size =3, nudge_y = 0.03) +
 #  theme_bw()
 ```
+## Local ancestry
+Generated with aHMM from ancestryinfer
 
+```{r}
+## build example aHMM output plots
+
+# F1 example - JH0165 (parent to mapping pop): 19_615
+chr2_19.516 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr2/19.516_HYB.posterior")
+names(chr2_19.516) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+chr2_19.516_0.9co <- chr2_19.516 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr2 <- ggplot(chr2_19.516_0.9co, aes(position, ancestry)) + 
+  ggtitle("H_19.516 chr2 30001 sites") +
+  geom_point() +
+  ylim(-0.01,1.01)
+
+chr3_19.516 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr3/19.516_HYB.posterior")
+names(chr3_19.516) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+chr3_19.516_0.9co <- chr3_19.516 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr3 <- ggplot(chr3_19.516_0.9co, aes(position, ancestry)) + 
+  ggtitle("H_19.516 chr3 20397 sites") +
+  geom_point() +
+  ylim(-0.01,1.01)
+
+chr1_19.516 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr1/19.516_HYB.posterior")
+names(chr1_19.516) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+chr1_19.516_0.9co <- chr1_19.516 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr1 <- ggplot(chr1_19.516_0.9co, aes(position, ancestry)) + 
+  ggtitle("H_19.516 chr1 26746 sites") +
+  geom_point() +
+  ylim(-0.01,1.01)
+
+chr2_19.516 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr2/19.516_HYB.posterior")
+names(chr2_19.516) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+chr2_19.516_0.9co <- chr2_19.516 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr2 <- ggplot(chr2_19.516_0.9co, aes(position, ancestry)) + 
+  ggtitle("H_19.516 chr2 30001 sites") +
+  geom_point() +
+  ylim(-0.01,1.01)
+
+
+H_19.516_all_chrs <- chr1 + chr2 + chr3 + chr4 + chr5 + chr6 + chr7 + chr8 + chr9 + plot_layout(ncol = 3)
+
+ggsave("aHMM/final_params_0.02er_0.0001pulse/H_19.516_all_chrs_filtered_final_params_aHMM_plot.pdf", H_19.516_all_chrs, units = "mm", width = 500, height = 375)
+
+```
 ## ABBA/BABA
 
 ```{r}
@@ -265,67 +311,94 @@ raw_pvals <- c(8.12e-07, 2.66e-06, 4.52e-13,  1.39e-10, 7.16e-09, 1.27e-07, 1.20
 FDR_pvals <- p.adjust(raw_pvals, method = "BH")
 ```
 
-### Plotting f_dM
+### Plotting f_dM and d_f
 
 #### 50 variant windows, 25 variant steps
 
 ```{r}
 # Read all chromosome files intoo single dataframe
 # Create an empty dataframe to store the combined data
-LAEVout_w50s25_all9 <- data.frame()
+LASIout_w50s25_all9 <- data.frame()
 
 # List all the .tsv files in the directory
-file_list <- list.files(path = "./Dsuite/f_dM_w50s25/", pattern = "*.tsv", full.names = TRUE)
+file_list <- list.files(path = "./Dsuite/f_Dm_w50s25", pattern = "*.txt", full.names = TRUE)
 
 # Loop through each file and read it into a temporary dataframe
 for (file in file_list) {
   temp_df <- read.delim(file, sep = "\t")
   
   # Combine the temporary dataframe with the existing data
-  LAEVout_w50s25_all9 <- rbind(LAEVout_w50s25_all9, temp_df)
+  LASIout_w50s25_all9 <- rbind(LASIout_w50s25_all9, temp_df)
 }
 
 # Plotting 50,25 f_dM
 
 # remove small contigs, keep only chromosomes
-LAEVout_w50s25_all9 <- LAEVout_w50s25_all9 %>% 
+LASIout_w50s25_all9 <- LASIout_w50s25_all9 %>% 
   filter(startsWith(chr, "Chrom"))
 
 # check for failed rows
-# LAEVout_w50s25_all9[is.na(LAEVout_w50s25_all9$f_dM), ]
+# LASIout_w50s25_all9[is.na(LASIout_w50s25_all9$f_dM), ]
+# None! yay!
 # remove failed rows
-LAEVout_w50s25_all9 <- LAEVout_w50s25_all9[!is.na(LAEVout_w50s25_all9$f_dM), ]
+# LASIout_w50s25_all9 <- LASIout_w50s25_all9[!is.na(LASIout_w50s25_all9$f_dM), ]
 
-# create thresholds of mean + and - three standard deviations
-mean_plus_three_sd <- mean(LAEVout_w50s25_all9$f_dM)+3*sd(LAEVout_w50s25_all9$f_dM)
-mean_minus_three_sd <- mean(LAEVout_w50s25_all9$f_dM)-3*sd(LAEVout_w50s25_all9$f_dM)
+### plotting f_dM ###
+# Create cutofLASIout_w50s25_all9 with increasing stringency based on percentiles of the distribution of negative values (as suggested by Duite creator, Milan Malinsky) 
+cutoff99thPercentile <- quantile(abs(LASIout_w50s25_all9$f_dM[which(LASIout_w50s25_all9$f_dM < 0)]),0.99)
+cutoff99.9thPercentile <- quantile(abs(LASIout_w50s25_all9$f_dM[which(LASIout_w50s25_all9$f_dM < 0)]),0.999)
+cutoff99.99thPercentile <- quantile(abs(LASIout_w50s25_all9$f_dM[which(LASIout_w50s25_all9$f_dM < 0)]),0.9999)
 
 # create single bp location for x-axis that adds previous chromosmes lengths
-data_cum <- LAEVout_w50s25_all9 %>% 
+data_cum <- LASIout_w50s25_all9 %>% 
   group_by(chr) %>% 
   summarise(max_windowStart = max(windowStart)) %>% 
   mutate(windowStart_add = lag(cumsum(max_windowStart), default = 0)) %>% 
   select(chr, windowStart_add)
 
-LAEVout_w50s25_all9 <- LAEVout_w50s25_all9 %>% 
+LASIout_w50s25_all9 <- LASIout_w50s25_all9 %>% 
   inner_join(data_cum, by = "chr") %>% 
   mutate(windowStart_cum = windowStart + windowStart_add)
 
-axis_set <- LAEVout_w50s25_all9 %>% 
+axis_set <- LASIout_w50s25_all9 %>% 
   group_by(chr) %>% 
   summarize(center = mean(windowStart_cum))
 
-ggplot(data=LAEVout_w50s25_all9, aes(x=windowStart_cum, y=f_dM, color = as_factor(chr))) +
+LASI_99.9thper_w50s25_f_dM <- ggplot(data=LASIout_w50s25_all9, aes(x=windowStart_cum, y=f_dM, color = as_factor(chr))) +
   geom_point() +
-  geom_hline(yintercept = c(mean_plus_three_sd, mean_minus_three_sd), linetype = "dashed", color = "red") +
+  coord_cartesian(xlim = c(24398, 1120430367)) +
+  geom_hline(yintercept = c(cutoff99.9thPercentile, -cutoff99.9thPercentile), linetype = "dashed", color = "red") +
   scale_color_manual(values = rep(c("black", "darkgray"), unique(length(axis_set$chr)))) +
   guides(color = "none") +
-  geom_point(data = subset(LAEVout_w50s25_all9, f_dM > mean_plus_three_sd | f_dM < mean_minus_three_sd), color = "red") +
+  geom_point(data = subset(LASIout_w50s25_all9, f_dM > cutoff99.9thPercentile | f_dM < -cutoff99.9thPercentile), color = "red") +
   scale_x_continuous(label = axis_set$chr, breaks = axis_set$center) +
   labs(x = NULL, 
-       y = "f<sub>dM")
+       y = "f_dM")
 
-# Save plot
-ggsave("Dsuite/LAEVout_w50s25_f_dM_allChrs.png", device = "png", width = 110, height = 7, units = "cm")
+# # Save plot
+# ggsave("Dsuite/LASIout_w50s25_f_dM_allChrs_cutoff99.9thPer.png", LASI_99.9thper_w50s25_f_dM, device = "png", width = 110, height = 7, units = "cm")
 
+### plotting d_f ###
+# Create cutofLASIout_w50s25_all9 with increasing stringency based on percentiles of the distribution of negative values (as suggested by Duite creator, Milan Malinsky) 
+cutoff99thPercentile_d_f <- quantile(abs(LASIout_w50s25_all9$d_f[which(LASIout_w50s25_all9$d_f < 0)]),0.99)
+cutoff99.9thPercentile_d_f <- quantile(abs(LASIout_w50s25_all9$d_f[which(LASIout_w50s25_all9$d_f < 0)]),0.999)
+cutoff99.99thPercentile_d_f <- quantile(abs(LASIout_w50s25_all9$d_f[which(LASIout_w50s25_all9$d_f < 0)]),0.9999)
+
+LASI_99.9thper_w50s25_d_f <- ggplot(data=LASIout_w50s25_all9, aes(x=windowStart_cum, y=d_f, color = as_factor(chr))) +
+  geom_point() +
+  coord_cartesian(xlim = c(24398, 1120430367)) +
+  geom_hline(yintercept = c(cutoff99.9thPercentile_d_f, -cutoff99.9thPercentile_d_f), linetype = "dashed", color = "red") +
+  scale_color_manual(values = rep(c("black", "darkgray"), unique(length(axis_set$chr)))) +
+  guides(color = "none") +
+  geom_point(data = subset(LASIout_w50s25_all9, d_f > cutoff99.9thPercentile_d_f | d_f < -cutoff99.9thPercentile_d_f), color = "red") +
+  scale_x_continuous(label = axis_set$chr, breaks = axis_set$center) +
+  labs(x = NULL, 
+       y = "d_f")
+
+# # Save plot
+# ggsave("Dsuite/LASIout_w50s25_d_f_allChrs_cutoff99.9thPer.png", LASI_99.9thper_w50s25_d_f, device = "png", width = 110, height = 7, units = "cm")
+
+# save as 2 panel plot:
+LASI_out_f_dM.d_f_2panel <- LASI_99.9thper_w50s25_f_dM/LASI_99.9thper_w50s25_d_f
+ggsave("Dsuite/LASIout_w50s25_f_dM.d_f_2panel_allChrs_cutoff99.9thPer.png", LASI_out_f_dM.d_f_2panel, device = "png", width = 100, height = 16, units = "cm")
 ```

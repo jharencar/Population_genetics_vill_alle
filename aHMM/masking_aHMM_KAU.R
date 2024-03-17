@@ -1,3 +1,5 @@
+# Kate's loop to list sites for masking plus my loop to filter the panels
+# JGH file setup 
 
 library(readr)
 library("ggplot2")
@@ -11,7 +13,7 @@ rm(list = ls())
 ## notin operator
 `%notin%` <- Negate(`%in%`)
 
-setwd("./aHMM/")
+setwd("./aHMM/F1_posteriors_for_masking/")
 
 ## list all directories in working directory
 directories <- list.dirs(path = ".")
@@ -92,28 +94,27 @@ nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom7",]) 
 nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom8",]) #160, 1,751 (19321, 17570)
 nrow(misperforming_sites_unique[misperforming_sites_unique$chrom == "Chrom9",]) #92, 496 (17508, 17012)
 
-
-## Plotting functions in case you need to investigate... 
-ggplot(post[post$position<2.5e7,], aes(position, ancestry)) + 
-  #ggtitle(paste(IDs[i], chromosome)) +
-  geom_point() +
-  ylim(0,0.55)
-
-ggplot(post, aes(position, ancestry)) + 
-  #ggtitle(paste(IDs[i], chromosome)) +
-  geom_point() +
-  ylim(0,0.55)
+# ## Plotting functions in case you need to investigate... 
+# ggplot(post[post$position<2.5e7,], aes(position, ancestry)) + 
+#   #ggtitle(paste(IDs[i], chromosome)) +
+#   geom_point() +
+#   ylim(0,0.55)
+# 
+# ggplot(post, aes(position, ancestry)) + 
+#   #ggtitle(paste(IDs[i], chromosome)) +
+#   geom_point() +
+#   ylim(0,0.55)
 
 ## use new list of misperforming sites to filter panel files
 for (i in 1:length(posterior_directories)) {
   posterior_directory <- posterior_directories[i]
   # filter out rows with values for V1 and V2 matching values of chrom and position in the misperforming sites DF
-  panel_file <- list.files(posterior_directory, pattern = "*panel")
+  panel_file <- list.files(posterior_directory, pattern = "*_QTL.panel") #change for other panel file names, first time was just *panel
   panel <- read.table(paste0(posterior_directory,"/",panel_file))
   panel_name <- paste0("panel_chr", i)
   filtered_panel <- panel %>%
   anti_join(misperforming_sites_unique, by = c("V1" = "chrom", "V2" = "position"))
   assign(panel_name, filtered_panel)
-  file_name <- paste0("chr", i, "_filtered.panel")
+  file_name <- paste0("chr", i, "_QTL_filtered.panel")
   write.table(get(paste0("panel_chr", i)), file = file_name, sep = "\t", row.names = FALSE, col.names=FALSE)
 }
