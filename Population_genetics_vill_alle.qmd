@@ -65,11 +65,15 @@ variance_explained[2] # 0.101
 ggplot(PC12.LGAVHB.co0.15, aes(x=PC1, y=PC2, fill=spp)) +
   geom_point(size = 3, pch = 21, colour="black") +
   scale_x_reverse() +
+  xlab("PC1 (11.5%)") +
+  ylab("PC2 (10.1%)") +
   theme_bw() + 
-  geom_text_repel(aes(label=ID), size =1.5, nudge_y = 0.03, max.overlaps = 30)
+  annotate("text", x = -0.2, y = 0.075, label = paste("# sites = 7,195"), hjust = 1.1, vjust = -1.5, size = 4, color = "black")
+  
+#geom_text_repel(aes(label=ID), size =1.5, nudge_y = 0.03, max.overlaps = 30)
 #ggtitle("AVH1.selected.sites.co0.15x") +
 #geom_text_repel(aes(label=ID), size =3, nudge_y = 0.03)
- 
+
   
 ## example of how to add repelled text labels:
 #library(ggrepel)
@@ -211,46 +215,165 @@ Generated with aHMM from ancestryinfer
 
 ```{r}
 ## build example aHMM output plots
+# chromosome 1
+chr1_19.560 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr1/19.560_HYB.posterior")
+chr1_19.615 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr1/19.615_HYB.posterior")
+chr1_19.727 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr1/19.727_HYB.posterior")
 
-# F1 example - JH0165 (parent to mapping pop): 19_615
-chr2_19.516 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr2/19.516_HYB.posterior")
-names(chr2_19.516) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
-chr2_19.516_0.9co <- chr2_19.516 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
-chr2 <- ggplot(chr2_19.516_0.9co, aes(position, ancestry)) + 
-  ggtitle("H_19.516 chr2 30001 sites") +
-  geom_point() +
-  ylim(-0.01,1.01)
+names(chr1_19.560) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr1_19.615) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr1_19.727) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
 
-chr3_19.516 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr3/19.516_HYB.posterior")
-names(chr3_19.516) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
-chr3_19.516_0.9co <- chr3_19.516 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
-chr3 <- ggplot(chr3_19.516_0.9co, aes(position, ancestry)) + 
-  ggtitle("H_19.516 chr3 20397 sites") +
-  geom_point() +
-  ylim(-0.01,1.01)
+chr1_19.560_0.9co <- chr1_19.560 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr1_19.615_0.9co <- chr1_19.615 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr1_19.727_0.9co <- chr1_19.727 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
 
-chr1_19.516 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr1/19.516_HYB.posterior")
-names(chr1_19.516) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
-chr1_19.516_0.9co <- chr1_19.516 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
-chr1 <- ggplot(chr1_19.516_0.9co, aes(position, ancestry)) + 
-  ggtitle("H_19.516 chr1 26746 sites") +
-  geom_point() +
-  ylim(-0.01,1.01)
+chr1_19.560 <- ggplot(chr1_19.560_0.9co, aes(position, ancestry)) + ggtitle("H_19.560 chr1 26746 sites") + geom_point() + ylim(-0.01,1.01)
+chr1_19.615 <- ggplot(chr1_19.615_0.9co, aes(position, ancestry)) + ggtitle("H_19.615 chr1 26746 sites") + geom_point() + ylim(-0.01,1.01)
+chr1_19.727 <- ggplot(chr1_19.727_0.9co, aes(position, ancestry)) + ggtitle("H_19.727 chr1 26746 sites") + geom_point() + ylim(-0.01,1.01)
 
-chr2_19.516 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr2/19.516_HYB.posterior")
-names(chr2_19.516) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
-chr2_19.516_0.9co <- chr2_19.516 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
-chr2 <- ggplot(chr2_19.516_0.9co, aes(position, ancestry)) + 
-  ggtitle("H_19.516 chr2 30001 sites") +
-  geom_point() +
-  ylim(-0.01,1.01)
+# chromosome 2
+chr2_19.560 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr2/19.560_HYB.posterior")
+chr2_19.615 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr2/19.615_HYB.posterior")
+chr2_19.727 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr2/19.727_HYB.posterior")
 
+names(chr2_19.560) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr2_19.615) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr2_19.727) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
 
-H_19.516_all_chrs <- chr1 + chr2 + chr3 + chr4 + chr5 + chr6 + chr7 + chr8 + chr9 + plot_layout(ncol = 3)
+chr2_19.560_0.9co <- chr2_19.560 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr2_19.615_0.9co <- chr2_19.615 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr2_19.727_0.9co <- chr2_19.727 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
 
-ggsave("aHMM/final_params_0.02er_0.0001pulse/H_19.516_all_chrs_filtered_final_params_aHMM_plot.pdf", H_19.516_all_chrs, units = "mm", width = 500, height = 375)
+chr2_19.560 <- ggplot(chr2_19.560_0.9co, aes(position, ancestry)) + ggtitle("H_19.560 chr2 30001 sites") + geom_point() + ylim(-0.01,1.01)
+chr2_19.615 <- ggplot(chr2_19.615_0.9co, aes(position, ancestry)) + ggtitle("H_19.615 chr2 30001 sites") + geom_point() + ylim(-0.01,1.01)
+chr2_19.727 <- ggplot(chr2_19.727_0.9co, aes(position, ancestry)) + ggtitle("H_19.727 chr2 30001 sites") + geom_point() + ylim(-0.01,1.01)
+
+# chromosome 3
+chr3_19.560 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr3/19.560_HYB.posterior")
+chr3_19.615 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr3/19.615_HYB.posterior")
+chr3_19.727 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr3/19.727_HYB.posterior")
+
+names(chr3_19.560) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr3_19.615) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr3_19.727) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+
+chr3_19.560_0.9co <- chr3_19.560 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr3_19.615_0.9co <- chr3_19.615 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr3_19.727_0.9co <- chr3_19.727 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+
+chr3_19.560 <- ggplot(chr3_19.560_0.9co, aes(position, ancestry)) + ggtitle("H_19.560 chr3 20397 sites") + geom_point() + ylim(-0.01,1.01)
+chr3_19.615 <- ggplot(chr3_19.615_0.9co, aes(position, ancestry)) + ggtitle("H_19.615 chr3 20397 sites") + geom_point() + ylim(-0.01,1.01)
+chr3_19.727 <- ggplot(chr3_19.727_0.9co, aes(position, ancestry)) + ggtitle("H_19.727 chr3 20397 sites") + geom_point() + ylim(-0.01,1.01)
+
+# cromosome 4
+chr4_19.560 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr4/19.560_HYB.posterior")
+chr4_19.615 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr4/19.615_HYB.posterior")
+chr4_19.727 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr4/19.727_HYB.posterior")
+
+names(chr4_19.560) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr4_19.615) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr4_19.727) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+
+chr4_19.560_0.9co <- chr4_19.560 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr4_19.615_0.9co <- chr4_19.615 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr4_19.727_0.9co <- chr4_19.727 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+
+chr4_19.560 <- ggplot(chr4_19.560_0.9co, aes(position, ancestry)) + ggtitle("H_19.560 chr4 17932 sites") + geom_point() + ylim(-0.01,1.01)
+chr4_19.615 <- ggplot(chr4_19.615_0.9co, aes(position, ancestry)) + ggtitle("H_19.615 chr4 17932 sites") + geom_point() + ylim(-0.01,1.01)
+chr4_19.727 <- ggplot(chr4_19.727_0.9co, aes(position, ancestry)) + ggtitle("H_19.727 chr4 17932 sites") + geom_point() + ylim(-0.01,1.01)
+
+# chromosome 5
+chr5_19.560 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr5/19.560_HYB.posterior")
+chr5_19.615 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr5/19.615_HYB.posterior")
+chr5_19.727 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr5/19.727_HYB.posterior")
+
+names(chr5_19.560) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr5_19.615) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr5_19.727) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+
+chr5_19.560_0.9co <- chr5_19.560 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr5_19.615_0.9co <- chr5_19.615 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr5_19.727_0.9co <- chr5_19.727 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+
+chr5_19.560 <- ggplot(chr5_19.560_0.9co, aes(position, ancestry)) + ggtitle("H_19.560 chr5 24607 sites") + geom_point() + ylim(-0.01,1.01)
+chr5_19.615 <- ggplot(chr5_19.615_0.9co, aes(position, ancestry)) + ggtitle("H_19.615 chr5 24607 sites") + geom_point() + ylim(-0.01,1.01)
+chr5_19.727 <- ggplot(chr5_19.727_0.9co, aes(position, ancestry)) + ggtitle("H_19.727 chr5 24607 sites") + geom_point() + ylim(-0.01,1.01)
+
+# chromosome 6
+chr6_19.560 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr6/19.560_HYB.posterior")
+chr6_19.615 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr6/19.615_HYB.posterior")
+chr6_19.727 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr6/19.727_HYB.posterior")
+
+names(chr6_19.560) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr6_19.615) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr6_19.727) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+
+chr6_19.560_0.9co <- chr6_19.560 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr6_19.615_0.9co <- chr6_19.615 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr6_19.727_0.9co <- chr6_19.727 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+
+chr6_19.560 <- ggplot(chr6_19.560_0.9co, aes(position, ancestry)) + ggtitle("H_19.560 chr6 19823 sites") + geom_point() + ylim(-0.01,1.01)
+chr6_19.615 <- ggplot(chr6_19.615_0.9co, aes(position, ancestry)) + ggtitle("H_19.615 chr6 19823 sites") + geom_point() + ylim(-0.01,1.01)
+chr6_19.727 <- ggplot(chr6_19.727_0.9co, aes(position, ancestry)) + ggtitle("H_19.727 chr6 19823 sites") + geom_point() + ylim(-0.01,1.01)
+
+# chromosome 7
+chr7_19.560 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr7/19.560_HYB.posterior")
+chr7_19.615 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr7/19.615_HYB.posterior")
+chr7_19.727 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr7/19.727_HYB.posterior")
+
+names(chr7_19.560) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr7_19.615) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr7_19.727) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+
+chr7_19.560_0.9co <- chr7_19.560 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr7_19.615_0.9co <- chr7_19.615 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr7_19.727_0.9co <- chr7_19.727 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+
+chr7_19.560 <- ggplot(chr7_19.560_0.9co, aes(position, ancestry)) + ggtitle("H_19.560 chr7 17428 sites") + geom_point() + ylim(-0.01,1.01)
+chr7_19.615 <- ggplot(chr7_19.615_0.9co, aes(position, ancestry)) + ggtitle("H_19.615 chr7 17428 sites") + geom_point() + ylim(-0.01,1.01)
+chr7_19.727 <- ggplot(chr7_19.727_0.9co, aes(position, ancestry)) + ggtitle("H_19.727 chr7 17428 sites") + geom_point() + ylim(-0.01,1.01)
+
+# chromosome 8
+chr8_19.560 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr8/19.560_HYB.posterior")
+chr8_19.615 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr8/19.615_HYB.posterior")
+chr8_19.727 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr8/19.727_HYB.posterior")
+
+names(chr8_19.560) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr8_19.615) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr8_19.727) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+
+chr8_19.560_0.9co <- chr8_19.560 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr8_19.615_0.9co <- chr8_19.615 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr8_19.727_0.9co <- chr8_19.727 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+
+chr8_19.560 <- ggplot(chr8_19.560_0.9co, aes(position, ancestry)) + ggtitle("H_19.560 chr8 17570 sites") + geom_point() + ylim(-0.01,1.01)
+chr8_19.615 <- ggplot(chr8_19.615_0.9co, aes(position, ancestry)) + ggtitle("H_19.615 chr8 17570 sites") + geom_point() + ylim(-0.01,1.01)
+chr8_19.727 <- ggplot(chr8_19.727_0.9co, aes(position, ancestry)) + ggtitle("H_19.727 chr8 17570 sites") + geom_point() + ylim(-0.01,1.01)
+
+# chromosome 9
+chr9_19.560 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr9/19.560_HYB.posterior")
+chr9_19.615 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr9/19.615_HYB.posterior")
+chr9_19.727 <- read_tsv("aHMM/final_params_0.02er_0.0001pulse/chr9/19.727_HYB.posterior")
+
+names(chr9_19.560) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr9_19.615) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+names(chr9_19.727) <- c("chrom", "position", "ref_homo", "het", "alt_homo")
+
+chr9_19.560_0.9co <- chr9_19.560 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr9_19.615_0.9co <- chr9_19.615 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+chr9_19.727_0.9co <- chr9_19.727 %>% filter(ref_homo > 0.9 | alt_homo > 0.9 | het > 0.9) %>% mutate (ancestry = ref_homo+het*0.5)
+
+chr9_19.560 <- ggplot(chr9_19.560_0.9co, aes(position, ancestry)) + ggtitle("H_19.560 chr9 17012 sites") + geom_point() + ylim(-0.01,1.01)
+chr9_19.615 <- ggplot(chr9_19.615_0.9co, aes(position, ancestry)) + ggtitle("H_19.615 chr9 17012 sites") + geom_point() + ylim(-0.01,1.01)
+chr9_19.727 <- ggplot(chr9_19.727_0.9co, aes(position, ancestry)) + ggtitle("H_19.727 chr9 17012 sites") + geom_point() + ylim(-0.01,1.01)
+
+three_ex_multipanel_wild <- chr1_19.615 / chr2_19.615 / chr3_19.615 / chr4_19.615 / chr5_19.615 / chr6_19.615 / chr7_19.615 / chr8_19.615 / chr9_19.615 |  chr1_19.727 / chr2_19.727 / chr3_19.727 / chr4_19.727 / chr5_19.727 / chr6_19.727 / chr7_19.727 / chr8_19.727 / chr9_19.727 | chr1_19.560 / chr2_19.560 / chr3_19.560 / chr4_19.560 / chr5_19.560 / chr6_19.560 / chr7_19.560 / chr8_19.560 / chr9_19.560 
+
+ggsave("aHMM/final_params_0.02er_0.0001pulse/three_ex_multipanel_wild_aHMM_plot.pdf", three_ex_multipanel_wild, units = "mm", width = 500, height = 700)
 
 ```
+
 ## ABBA/BABA
 
 ```{r}
@@ -365,6 +488,11 @@ axis_set <- LASIout_w50s25_all9 %>%
   summarize(center = mean(windowStart_cum))
 
 LASI_99.9thper_w50s25_f_dM <- ggplot(data=LASIout_w50s25_all9, aes(x=windowStart_cum, y=f_dM, color = as_factor(chr))) +
+  geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
+  geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
+  geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
+  geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
+  geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
   geom_point() +
   coord_cartesian(xlim = c(24398, 1120430367)) +
   geom_hline(yintercept = c(cutoff99.9thPercentile, -cutoff99.9thPercentile), linetype = "dashed", color = "red") +
@@ -373,7 +501,10 @@ LASI_99.9thper_w50s25_f_dM <- ggplot(data=LASIout_w50s25_all9, aes(x=windowStart
   geom_point(data = subset(LASIout_w50s25_all9, f_dM > cutoff99.9thPercentile | f_dM < -cutoff99.9thPercentile), color = "red") +
   scale_x_continuous(label = axis_set$chr, breaks = axis_set$center) +
   labs(x = NULL, 
-       y = "f_dM")
+       y = "f_dM") +
+  theme(axis.text=element_text(size=40),
+        axis.title=element_text(size=40),
+        plot.margin=unit(c(2,1,1,1), 'cm'))
 
 # # Save plot
 # ggsave("Dsuite/LASIout_w50s25_f_dM_allChrs_cutoff99.9thPer.png", LASI_99.9thper_w50s25_f_dM, device = "png", width = 110, height = 7, units = "cm")
@@ -385,6 +516,11 @@ cutoff99.9thPercentile_d_f <- quantile(abs(LASIout_w50s25_all9$d_f[which(LASIout
 cutoff99.99thPercentile_d_f <- quantile(abs(LASIout_w50s25_all9$d_f[which(LASIout_w50s25_all9$d_f < 0)]),0.9999)
 
 LASI_99.9thper_w50s25_d_f <- ggplot(data=LASIout_w50s25_all9, aes(x=windowStart_cum, y=d_f, color = as_factor(chr))) +
+  geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
+  geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
+  geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
+  geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
+  geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
   geom_point() +
   coord_cartesian(xlim = c(24398, 1120430367)) +
   geom_hline(yintercept = c(cutoff99.9thPercentile_d_f, -cutoff99.9thPercentile_d_f), linetype = "dashed", color = "red") +
@@ -393,7 +529,18 @@ LASI_99.9thper_w50s25_d_f <- ggplot(data=LASIout_w50s25_all9, aes(x=windowStart_
   geom_point(data = subset(LASIout_w50s25_all9, d_f > cutoff99.9thPercentile_d_f | d_f < -cutoff99.9thPercentile_d_f), color = "red") +
   scale_x_continuous(label = axis_set$chr, breaks = axis_set$center) +
   labs(x = NULL, 
-       y = "d_f")
+       y = "d_f") +
+  theme(axis.text=element_text(size=40),
+        axis.title=element_text(size=40))
+  
+# get first and last row per chromosome:
+first_last_chr <- LASIout_w50s25_all9 %>% 
+  group_by(chr) %>%
+  arrange(windowStart_cum) %>%
+  filter(row_number()==1 | row_number()==n())
+
+### figure out value for other chromosmes by filtering for just chrom two and returning full line or just windowStart_cum for row with closest value... where windowStart is less than X and windowEnd is greater than X, print windowStart_cum
+#OR - easier: print last row of each chromosome and just add the windowStart_cum value to X
 
 # # Save plot
 # ggsave("Dsuite/LASIout_w50s25_d_f_allChrs_cutoff99.9thPer.png", LASI_99.9thper_w50s25_d_f, device = "png", width = 110, height = 7, units = "cm")
@@ -402,3 +549,127 @@ LASI_99.9thper_w50s25_d_f <- ggplot(data=LASIout_w50s25_all9, aes(x=windowStart_
 LASI_out_f_dM.d_f_2panel <- LASI_99.9thper_w50s25_f_dM/LASI_99.9thper_w50s25_d_f
 ggsave("Dsuite/LASIout_w50s25_f_dM.d_f_2panel_allChrs_cutoff99.9thPer.png", LASI_out_f_dM.d_f_2panel, device = "png", width = 100, height = 16, units = "cm")
 ```
+## PIXY
+```{r}
+# function from the pixy website (https://pixy.readthedocs.io/en/latest/plotting.html)
+pixy_to_long <- function(pixy_files){
+  
+  pixy_df <- list()
+  
+  for(i in 1:length(pixy_files)){
+    
+    stat_file_type <- gsub(".*_|.txt", "", pixy_files[i])
+    
+    if(stat_file_type == "pi"){
+      
+      df <- read_delim(pixy_files[i], delim = "\t")
+      df <- df %>%
+        gather(-pop, -window_pos_1, -window_pos_2, -chromosome,
+               key = "statistic", value = "value") %>%
+        rename(pop1 = pop) %>%
+        mutate(pop2 = NA)
+      
+      pixy_df[[i]] <- df
+      
+      
+    } else{
+      
+      df <- read_delim(pixy_files[i], delim = "\t")
+      df <- df %>%
+        gather(-pop1, -pop2, -window_pos_1, -window_pos_2, -chromosome,
+               key = "statistic", value = "value")
+      pixy_df[[i]] <- df
+      
+    }
+    
+  }
+  
+  bind_rows(pixy_df) %>%
+    arrange(pop1, pop2, chromosome, window_pos_1, statistic)
+  
+}
+
+# Import my data
+pixy_folder <- "/Users/juliaharencar/Documents/Github/Population_genetics_vill_alle/pixy/output"
+pixy_files <- list.files(pixy_folder, full.names = TRUE)
+pixy_df <- pixy_to_long(pixy_files)
+pixy_wide <- pivot_wider(pixy_df, names_from = statistic, values_from = value) %>% 
+  mutate(chr_position = ((window_pos_1 + window_pos_2)/2)/1000000)
+
+# create single bp location for x-axis that adds previous chromosmes lengths
+pixy_data_cum <- pixy_wide %>% 
+  group_by(chromosome) %>% 
+  summarise(max_windowStart = max(window_pos_1)) %>% 
+  mutate(windowStart_add = lag(cumsum(max_windowStart), default = 0)) %>% 
+  select(chromosome, windowStart_add)
+
+pixy_wide <- pixy_wide %>% 
+  inner_join(pixy_data_cum, by = "chromosome") %>% 
+  mutate(windowStart_cum = window_pos_1 + windowStart_add)
+
+axis_set <- pixy_wide %>% 
+  group_by(chromosome) %>% 
+  summarize(center = mean(windowStart_cum))
+
+
+cutoff99.9thPercentile <- quantile(pixy_wide$avg_dxy,0.999, na.rm = T)
+
+# plot dxy
+Dxy_plot <- ggplot(data=pixy_wide, aes(x=windowStart_cum, y=avg_dxy, color = as_factor(chromosome))) +
+  geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
+  geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
+  geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
+  geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
+  geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
+  geom_point() +
+  scale_color_manual(values = rep(c("black", "darkgray"), unique(length(axis_set$chromosome)))) +
+  guides(color = "none") +
+  scale_x_continuous(label = axis_set$chromosome, breaks = axis_set$center) +
+  labs(x = NULL, 
+       y = "Dxy") +
+  geom_hline(yintercept = cutoff99.9thPercentile, linetype = "dashed", color = "red") +
+  geom_point(data = subset(pixy_wide, avg_dxy > cutoff99.9thPercentile), color = "red") +
+  theme(axis.text=element_text(size=40),
+        axis.title=element_text(size=40))
+
+# plot pi
+pi_plot <- ggplot(data=pixy_wide, aes(x=windowStart_cum, y=avg_pi, color = as_factor(chromosome))) +
+  geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
+  geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
+  geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
+  geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
+  geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
+  geom_point() +
+  scale_color_manual(values = rep(c("black", "darkgray"), unique(length(axis_set$chromosome)))) +
+  guides(color = "none") +
+  scale_x_continuous(label = axis_set$chromosome, breaks = axis_set$center) +
+  labs(x = NULL, 
+       y = "pi") +
+  theme(axis.text=element_text(size=40),
+        axis.title=element_text(size=40))
+  
+# # plot Fst
+# wv_fst_plot <- ggplot(data=pixy_wide, aes(x=windowStart_cum, y=avg_wc_fst, color = as_factor(chromosome))) +
+#   geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
+#   geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
+#   geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
+#   geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
+#   geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
+#   geom_point() +
+#   scale_color_manual(values = rep(c("black", "darkgray"), unique(length(axis_set$chromosome)))) +
+#   guides(color = "none") +
+#   scale_x_continuous(label = axis_set$chromosome, breaks = axis_set$center) +
+#   labs(x = NULL, 
+#        y = "Fst") 
+
+# 3 panel pixy only
+# Dxy_plot/pi_plot/wv_fst_plot 
+
+# 4 panel Dsuite and pixy:
+combo_Dsuite_pixy_4panel <- LASI_99.9thper_w50s25_f_dM/LASI_99.9thper_w50s25_d_f/Dxy_plot/pi_plot + plot_annotation(tag_levels = 'A', tag_suffix = ')') & 
+  theme(plot.tag.position = c(0, 1),
+        plot.tag = element_text(size = 40, hjust = 0, vjust = 0))
+
+ggsave("combo_Dsuite_pixy_4panel.png", combo_Dsuite_pixy_4panel, device = "png", width = 100, height = 36, units = "cm")
+```
+
