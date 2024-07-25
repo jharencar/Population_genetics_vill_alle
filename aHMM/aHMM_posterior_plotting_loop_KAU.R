@@ -16,12 +16,15 @@ rm(list = ls())
 # setwd("/Users/juliaharencar/Documents/Github/Population_genetics_vill_alle/aHMM/final_params_0.02er_0.0001pulse")
 
 # QTL wd
-setwd("/Users/juliaharencar/Documents/Github/alle_vill_QTL/aHMM/full_final_posteriors/")
+#setwd("/Users/juliaharencar/Documents/Github/alle_vill_QTL/aHMM/full_final_posteriors/")
+setwd("/Users/juliaharencar/Documents/Github/alle_vill_QTL/aHMM/DP1_minDif0.3")
+setwd("/Users/juliaharencar/Documents/Github/Population_genetics_vill_alle/aHMM/pre_filter_rr.7_minDif0.3")
 
-directory <- "./chr2/tmp/"
-chromosome <- "chr2"
+directory <- "./chr9/"
+chromosome <- "chr9"
 
 files <- list.files(directory, pattern = "*posterior")
+#files <- files[grep("HYB", files)]
 IDs <- substr(files, 1, 9)
 
 plot_list = list()
@@ -40,15 +43,35 @@ for (i in 1:length(files)) {
   plot_list[[i]] = p
 }
 
-pdf("chr2.QTL.final_params_0.02e_0.0001p.pdf", height = 25, width = 12)
+
+pdf("chr9.QTL_DP1_minDif0.3.pdf", height = 15, width = 12)
+# looking at just 15 from mapping pop
+plot_grid(plot_list[[1]], plot_list[[2]], plot_list[[3]], plot_list[[4]],
+          plot_list[[5]],plot_list[[6]], plot_list[[7]], plot_list[[8]],
+          plot_list[[9]], plot_list[[10]], plot_list[[11]], plot_list[[12]],
+          nrow = 6,
+          ncol = 2)
+dev.off()
+
+pdf("chr2.popgen_minDP_1.5_minDif_0.3.pdf", height = 25, width = 12)
 # looking at just 15 from mapping pop
 plot_grid(plot_list[[1]], plot_list[[2]], plot_list[[3]], plot_list[[4]],
           plot_list[[5]], plot_list[[6]], plot_list[[7]], plot_list[[8]],
           plot_list[[9]], plot_list[[10]], plot_list[[11]], plot_list[[12]],
-          plot_list[[13]], plot_list[[14]],
-          nrow = 9,
+          plot_list[[13]],
+          nrow = 7,
           ncol = 2)
 dev.off()
+
+# pdf("chr2.QTL.final_params_0.02e_0.0001p.pdf", height = 25, width = 12)
+# # looking at just 15 from mapping pop
+# plot_grid(plot_list[[1]], plot_list[[2]], plot_list[[3]], plot_list[[4]],
+#           plot_list[[5]], plot_list[[6]], plot_list[[7]], plot_list[[8]],
+#           plot_list[[9]], plot_list[[10]], plot_list[[11]], plot_list[[12]],
+#           plot_list[[13]], plot_list[[14]],
+#           nrow = 9,
+#           ncol = 2)
+# dev.off()
 
 # # for popgen (all 66):
 # pdf("chr8.popgen.final_params_0.02e_0.0001p.pdf", height = 80, width = 12)
