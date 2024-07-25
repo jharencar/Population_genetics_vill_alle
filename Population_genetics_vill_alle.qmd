@@ -444,7 +444,7 @@ FDR_pvals <- p.adjust(raw_pvals, method = "BH")
 LASIout_w50s25_all9 <- data.frame()
 
 # List all the .tsv files in the directory
-file_list <- list.files(path = "./Dsuite/f_Dm_w50s25", pattern = "*.txt", full.names = TRUE)
+file_list <- list.files(path = "./Dsuite/f_Dm_w50s25_refV2", pattern = "*.txt", full.names = TRUE)
 
 # Loop through each file and read it into a temporary dataframe
 for (file in file_list) {
@@ -488,11 +488,11 @@ axis_set <- LASIout_w50s25_all9 %>%
   summarize(center = mean(windowStart_cum))
 
 LASI_99.9thper_w50s25_f_dM <- ggplot(data=LASIout_w50s25_all9, aes(x=windowStart_cum, y=f_dM, color = as_factor(chr))) +
-  geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
-  geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
-  geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
-  geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
-  geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
+  # geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
+  # geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
+  # geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
+  # geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
+  # geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
   geom_point() +
   coord_cartesian(xlim = c(24398, 1120430367)) +
   geom_hline(yintercept = c(cutoff99.9thPercentile, -cutoff99.9thPercentile), linetype = "dashed", color = "red") +
@@ -516,11 +516,11 @@ cutoff99.9thPercentile_d_f <- quantile(abs(LASIout_w50s25_all9$d_f[which(LASIout
 cutoff99.99thPercentile_d_f <- quantile(abs(LASIout_w50s25_all9$d_f[which(LASIout_w50s25_all9$d_f < 0)]),0.9999)
 
 LASI_99.9thper_w50s25_d_f <- ggplot(data=LASIout_w50s25_all9, aes(x=windowStart_cum, y=d_f, color = as_factor(chr))) +
-  geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
-  geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
-  geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
-  geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
-  geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
+  # geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
+  # geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
+  # geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
+  # geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
+  # geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
   geom_point() +
   coord_cartesian(xlim = c(24398, 1120430367)) +
   geom_hline(yintercept = c(cutoff99.9thPercentile_d_f, -cutoff99.9thPercentile_d_f), linetype = "dashed", color = "red") +
@@ -590,12 +590,88 @@ pixy_to_long <- function(pixy_files){
 }
 
 # Import my data
-pixy_folder <- "/Users/juliaharencar/Documents/Github/Population_genetics_vill_alle/pixy/output"
+pixy_folder <- "/Users/juliaharencar/Documents/Github/Population_genetics_vill_alle/pixy/output_0.2missingness_per_spp"
 pixy_files <- list.files(pixy_folder, full.names = TRUE)
 pixy_df <- pixy_to_long(pixy_files)
 pixy_wide <- pivot_wider(pixy_df, names_from = statistic, values_from = value) %>% 
   mutate(chr_position = ((window_pos_1 + window_pos_2)/2)/1000000)
 
+# # check congruence of chromosom positions with Dsuite
+# first_last_chr_pixy <- pixy_wide %>% 
+#   group_by(chromosome) %>%
+#   arrange(windowStart_cum) %>%
+#   filter(row_number()==1 | row_number()==n())
+
+# plot with pixy's code, panel for each chromosome
+
+pixy_labeller <- as_labeller(c(avg_pi = "pi",
+                             avg_dxy = "D[XY]",
+                             avg_wc_fst = "F[ST]"),
+                             default = label_parsed)
+
+# plotting summary statistics along a single chromosome
+pixy_chr1 <- pixy_df %>%
+  filter(chromosome == "Chrom1") %>%
+  filter(statistic %in% c("avg_pi", "avg_dxy", "avg_wc_fst")) %>%
+  mutate(chr_position = ((window_pos_1 + window_pos_2)/2)/1000000) %>%
+  ggplot(aes(x = chr_position, y = value, color = statistic))+
+  geom_line(size = 0.25)+
+  facet_grid(statistic ~ .,
+             scales = "free_y", switch = "x", space = "free_x",
+             labeller = labeller(statistic = pixy_labeller,
+                                 value = label_value))+
+  xlab("Position on Chromosome (Mb)")+
+  ylab("Statistic Value")+
+  theme_bw()+
+  theme(panel.spacing = unit(0.1, "cm"),
+        strip.background = element_blank(),
+        strip.placement = "outside",
+        legend.position = "none")+
+  scale_x_continuous(expand = c(0, 0))+
+  scale_y_continuous(expand = c(0, 0))+
+  scale_color_brewer(palette = "Set1")
+
+# Define a list to store the ggplot objects for each chromosome
+ggplot_list <- list()
+
+# Loop through 9 chromosomes
+for (i in 1:9) {
+  chr_name <- paste0("pixy_chr", i)
+  chr_assignment <- paste0("Chrom", i)
+  
+  # Filter the data for the current chromosome
+  filtered_df <- pixy_df %>%
+    filter(chromosome == chr_assignment) %>%
+    filter(statistic %in% c("avg_pi", "avg_dxy", "avg_wc_fst")) %>%
+    mutate(chr_position = ((window_pos_1 + window_pos_2)/2)/1000000)
+  
+  # Create the ggplot for the current chromosome
+  gg <- ggplot(filtered_df, aes(x = chr_position, y = value, color = statistic)) +
+    geom_line(size = 0.25) +
+    facet_grid(statistic ~ ., scales = "free_y", switch = "x", space = "free_x",
+               labeller = labeller(statistic = pixy_labeller, value = label_value)) +
+    xlab(paste0("Position on Chromosome ", i, " (Mb)")) +
+    ylab("Statistic Value") +
+    theme_bw() +
+    theme(panel.spacing = unit(0.1, "cm"), strip.background = element_blank(),
+          strip.placement = "outside", legend.position = "none") +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_color_brewer(palette = "Set1")
+  
+  # Add the ggplot to the list
+  ggplot_list[[chr_name]] <- gg
+}
+
+ggplot_list[["pixy_chr1"]]
+
+pdf("pixy_all_per_chrom_20per_each.pdf", height = 12, width = 12)
+plot_grid(ggplot_list[["pixy_chr1"]],ggplot_list[["pixy_chr2"]],ggplot_list[["pixy_chr3"]],ggplot_list[["pixy_chr4"]],ggplot_list[["pixy_chr5"]],ggplot_list[["pixy_chr6"]],ggplot_list[["pixy_chr7"]],ggplot_list[["pixy_chr8"]],ggplot_list[["pixy_chr9"]],
+          nrow = 3,
+          ncol = 3)
+dev.off()
+
+### MY plotting ###
 # create single bp location for x-axis that adds previous chromosmes lengths
 pixy_data_cum <- pixy_wide %>% 
   group_by(chromosome) %>% 
@@ -616,11 +692,11 @@ cutoff99.9thPercentile <- quantile(pixy_wide$avg_dxy,0.999, na.rm = T)
 
 # plot dxy
 Dxy_plot <- ggplot(data=pixy_wide, aes(x=windowStart_cum, y=avg_dxy, color = as_factor(chromosome))) +
-  geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
-  geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
-  geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
-  geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
-  geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
+  # geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
+  # geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
+  # geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
+  # geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
+  # geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
   geom_point() +
   scale_color_manual(values = rep(c("black", "darkgray"), unique(length(axis_set$chromosome)))) +
   guides(color = "none") +
@@ -632,44 +708,55 @@ Dxy_plot <- ggplot(data=pixy_wide, aes(x=windowStart_cum, y=avg_dxy, color = as_
   theme(axis.text=element_text(size=40),
         axis.title=element_text(size=40))
 
+
 # plot pi
+cutoff99.9thPercentile <- quantile(pixy_wide$avg_pi,0.999, na.rm = T)
 pi_plot <- ggplot(data=pixy_wide, aes(x=windowStart_cum, y=avg_pi, color = as_factor(chromosome))) +
-  geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
-  geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
-  geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
-  geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
-  geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
+  # geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
+  # geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
+  # geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
+  # geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
+  # geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
   geom_point() +
   scale_color_manual(values = rep(c("black", "darkgray"), unique(length(axis_set$chromosome)))) +
   guides(color = "none") +
   scale_x_continuous(label = axis_set$chromosome, breaks = axis_set$center) +
   labs(x = NULL, 
        y = "pi") +
+  geom_hline(yintercept = cutoff99.9thPercentile, linetype = "dashed", color = "red") +
+  geom_point(data = subset(pixy_wide, avg_pi > cutoff99.9thPercentile), color = "red") +
   theme(axis.text=element_text(size=40),
         axis.title=element_text(size=40))
   
 # # plot Fst
-# wv_fst_plot <- ggplot(data=pixy_wide, aes(x=windowStart_cum, y=avg_wc_fst, color = as_factor(chromosome))) +
-#   geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
-#   geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
-#   geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
+wc_fst_plot <- ggplot(data=pixy_wide, aes(x=windowStart_cum, y=avg_wc_fst, color = as_factor(chromosome))) +
+#  geom_vline(xintercept = 71772467, colour = "green", linewidth =2) + # line for % chloro reabsorp
+#  geom_vline(xintercept = 83412886, colour = "purple", linewidth =2) + # line for % N reabsorption
+#  geom_vline(xintercept = c(171402076,700244502), colour = "cyan3", linewidth =2) + # lines for seed dormancy
 #   geom_vline(xintercept = 322334915, colour = "orange", linewidth =2) + # line for toughness
 #   geom_vline(xintercept = 321497235, colour = "blue", linewidth =2) +# line for growth rate
-#   geom_point() +
-#   scale_color_manual(values = rep(c("black", "darkgray"), unique(length(axis_set$chromosome)))) +
-#   guides(color = "none") +
-#   scale_x_continuous(label = axis_set$chromosome, breaks = axis_set$center) +
-#   labs(x = NULL, 
-#        y = "Fst") 
+  geom_point() +
+  scale_color_manual(values = rep(c("black", "darkgray"), unique(length(axis_set$chromosome)))) +
+  guides(color = "none") +
+  scale_x_continuous(label = axis_set$chromosome, breaks = axis_set$center) +
+  labs(x = NULL, y = "Fst")
 
 # 3 panel pixy only
-# Dxy_plot/pi_plot/wv_fst_plot 
+# Dxy_plot/pi_plot/wv_fst_plot
 
 # 4 panel Dsuite and pixy:
 combo_Dsuite_pixy_4panel <- LASI_99.9thper_w50s25_f_dM/LASI_99.9thper_w50s25_d_f/Dxy_plot/pi_plot + plot_annotation(tag_levels = 'A', tag_suffix = ')') & 
   theme(plot.tag.position = c(0, 1),
         plot.tag = element_text(size = 40, hjust = 0, vjust = 0))
 
-ggsave("combo_Dsuite_pixy_4panel.png", combo_Dsuite_pixy_4panel, device = "png", width = 100, height = 36, units = "cm")
+ggsave("combo_Dsuite_pixy_4panel_refV2.png", combo_Dsuite_pixy_4panel, device = "png", width = 100, height = 36, units = "cm")
+
+# 5 panel with fst
+combo_Dsuite_pixy_5panel <- LASI_99.9thper_w50s25_f_dM/LASI_99.9thper_w50s25_d_f/Dxy_plot/pi_plot/wc_fst_plot + plot_annotation(tag_levels = 'A', tag_suffix = ')') & 
+  theme(plot.tag.position = c(0, 1),
+        plot.tag = element_text(size = 40, hjust = 0, vjust = 0))
+
+ggsave("combo_Dsuite_pixy_5panel_refV2.png", combo_Dsuite_pixy_5panel, device = "png", width = 100, height = 45, units = "cm")
+
 ```
 
