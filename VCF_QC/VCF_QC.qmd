@@ -1,0 +1,261 @@
+---
+title: "VCF_QC"
+author: "Julia Harenčár"
+date: "7/21/2024"
+format: 
+  html:
+    code-fold: true
+    code-tools: true
+    code-overflow: wrap
+    toc: true
+    number-sections: true
+theme:
+  light: minty
+  dark: superhero
+editor_options: 
+  chunk_output_type: console
+---
+
+##Calculate basic VCF stats
+
+```{bash}
+# set variables for cleaner code
+VCF=./VCF_QC/renamed_AHVF1_filtered_scaf_1_mappability_filtered.vcf.gz
+OUT=./VCF_QC/scaf_1_AVHBC_map_filt
+# 464 individuals
+
+# Calculate biallelic allele frequency
+vcftools --gzvcf $VCF --freq2 --out $OUT --max-alleles 2
+# chrom 7 before filter (AVmap- 464 indivs): # sites = 730217
+# chrom 7 after filter (AVmap- 464 indivs): # sites = 118074
+# ~600,000 fewer sites! Only ~16% of sites retained. 
+
+# chrom 1 before filter (AVHBC- 66 indivs): # sites = 2189004
+# chrom 1 after filter (AVHBC- 66 indivs): # sites = 708887
+
+# Calculate mean depth per indiv. 
+vcftools --gzvcf $VCF --depth --out $OUT
+
+# Calculate mean depth per site
+vcftools --gzvcf $VCF --site-mean-depth --out $OUT
+
+# Calculate site quality 
+vcftools --gzvcf $VCF --site-quality --out $OUT
+
+# Calculate proportion of missing data per individual
+vcftools --gzvcf $VCF --missing-indv --out $OUT
+
+# Calculate proportion of missing data per site
+vcftools --gzvcf $VCF --missing-site --out $OUT
+
+# Calculate heterozygosity and inbreeding coefficient per individual
+vcftools --gzvcf $VCF --het --out $OUT
+```
+
+## Visualize data quality with R
+```{r}
+#| output: false
+# load packages
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+### Quality
+```{r}
+#| echo: false
+# import data
+var_qual <- read_delim("./VCF_QC/scaf_1_AVHBC_no_map_filt.lqual", delim = "\t", col_names = c("chr", "pos", "qual"), skip = 1)
+var_qual_mfilt <- read_delim("./VCF_QC/scaf_1_AVHBC_map_filt.lqual", delim = "\t", col_names = c("chr", "pos", "qual"), skip = 1)
+
+# no map filter plots
+q <- ggplot(var_qual, aes(qual)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3)
+q + xlim(0, 100)
+
+# map filter plots
+qf <- ggplot(var_qual_mfilt, aes(qual)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3)
+qf
+qf + xlim(0, 100)
+
+```
+
+NOTES:
+pre-mapability filter - Big peak around qual=25, then tapering away towards higher vals. Nothing lower than qual 19 because of pre-filtering. There is a high density of alleles between qual 20 and 30... 
+post-mapability filter - pretty much identical
+
+### Variant Mean Depth
+
+```{r}
+# import data
+var_depth<- read_delim("./VCF_QC/scaf_1_AVHBC_no_map_filt.ldepth.mean", delim = "\t", col_names = c("chr", "pos", "mean_depth", "var_depth"), skip = 1)
+var_depth_mfilt <- read_delim("./VCF_QC/scaf_1_AVHBC_map_filt.ldepth.mean", delim = "\t", col_names = c("chr", "pos", "mean_depth", "var_depth"), skip = 1)
+
+# no map filter plot
+d<-ggplot(var_depth, aes(mean_depth)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3)
+d
+d + xlim(0, 2)
+
+# plot along chromosome:
+cd <- ggplot(var_depth, aes(x = pos, y = mean_depth)) +
+  geom_line() +
+  labs(x = "Chromosome Position (bp)", y = "Mean Depth") +
+  ggtitle("no map filter depth across chrom-1") + ylim(0, 45)
+
+
+# map filter plot
+df<-ggplot(var_depth_mfilt, aes(mean_depth)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3)
+df
+df + xlim(0, 2)
+
+# plot along chromosome:
+cdf <- ggplot(var_depth_mfilt, aes(x = pos, y = mean_depth)) +
+  geom_line() +
+  labs(x = "Chromosome Position (bp)", y = "Mean Depth") +
+  ggtitle("with map filter depth across chrom-1") + ylim(0, 45)
+
+#library(patchwork)
+cd/cdf
+ggsave("./VCF_QC/Depth_across_chrom1_pre_and_post_map_filt.pdf", width = 8, height = 6)
+# view data summary
+summary(var_depth_mfilt$mean_depth)
+# pre-map filter:
+#     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+# 0.006466 0.081897 0.314655 0.448431 0.721983 9.487070
+
+# post-map filter:
+#     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+# 0.006466 0.034483 0.088362 0.213281 0.232759 9.288790 
+```
+
+NOTES: Half the average depth after filter - specifically gets rid of lump in plot that does not follow an exponential curve. lump peak at ~0.75. I think this is showing me that it removed things that had a higher depth than expected based on the normal distribution of alelle depth expected by chance... I think it makes sense that these were removed- looking at the plot, it seems like that is where you might expect reads to fall that were actually from 2-3 real genetic locations, but instead mapped to 1, for example. Like, really low depth stuff wasnt impacted, but it cutts off the tail and redoces higher depth stuff. 
+
+## PICKUP - THIS is where I would looka t and think about quartile based depth filters (min and max allele depth). I will need to import all VCFs (after mappability filtering this will be wayyy faster), calculate this val, concatenate the files, and make this plot for all 9 chromosomes. 
+
+### Variant Missingness
+
+```{r}
+# import data
+var_miss <- read_delim("./VCF_QC/scaf_1_AVHBC_no_map_filt.lmiss", delim = "\t", col_names = c("chr", "pos", "nchr", "nfiltered", "nmiss", "fmiss"), skip = 1)
+
+var_miss_mfilt <- read_delim("./VCF_QC/scaf_1_AVHBC_map_filt.lmiss", delim = "\t", col_names = c("chr", "pos", "nchr", "nfiltered", "nmiss", "fmiss"), skip = 1)
+
+# no map filter plot
+ggplot(var_miss, aes(fmiss)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3)
+
+# map filter plot
+ggplot(var_miss_mfilt, aes(fmiss)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3)
+
+# summary
+summary(var_miss_mfilt$fmiss)
+# pre-map filter:
+ #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ # 0.0431  0.5560  0.7672  0.7343  0.9310  0.9978 
+
+# post-map filter:
+ #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ # 0.0431  0.8147  0.9224  0.8610  0.9677  0.9978 
+```
+
+NOTES:
+pre-mapability filter - lump around .5 missingness, tallest peak at high missingness (~.9 probs)
+post-mapability filter - median missingness way up, I think because took away all the middle missingness - now it is a smooth curve
+same general patten
+
+### Minor allele frequency
+
+```{r}
+# import data
+var_freq <- read_delim("./VCF_QC/scaf_1_AVHBC_no_map_filt.frq", delim = "\t",
+                       col_names = c("chr", "pos", "nalleles", "nchr", "a1", "a2"), skip = 1)
+var_freq_mfilt <- read_delim("./VCF_QC/scaf_1_AVHBC_map_filt.frq", delim = "\t",
+                       col_names = c("chr", "pos", "nalleles", "nchr", "a1", "a2"), skip = 1)
+
+# find minor allele frequency
+var_freq$maf <- var_freq %>% select(a1, a2) %>% apply(1, function(z) min(z))
+# Here we used apply on our allele frequencies to return the lowest allele frequency at each variant. We then added these to our dataframe as the variable maf. Next we will plot the distribution.
+var_freq_mfilt$maf <- var_freq_mfilt %>% select(a1, a2) %>% apply(1, function(z) min(z))
+
+# plot for no map filter
+ggplot(var_freq, aes(maf)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3)
+
+# plot with map filter
+ggplot(var_freq_mfilt, aes(maf)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3)
+
+# Summary stats
+summary(var_freq$maf)
+# pre-map filter:
+
+
+# post-map filter:
+#    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 0.05012 0.09091 0.15657 0.17888 0.25661 0.50000 
+```
+
+NOTES:
+pre-mapability filter -Interestingly lumpy, not a clean exponential decay (drops off after a sort of hummock at ~0.35)
+post-mapability filter - same general pattern
+
+### Mean Depth per individual
+
+```{r}
+# import data
+ind_depth <- read_delim("./VCF_QC/scaf_1_AVHBC_no_map_filt.idepth", delim = "\t", col_names = c("ind", "nsites", "depth"), skip = 1)
+
+ind_depth_mfilt <- read_delim("./VCF_QC/scaf_1_AVHBC_map_filt.idepth", delim = "\t", col_names = c("ind", "nsites", "depth"), skip = 1)
+
+# plot without map filter
+ggplot(ind_depth, aes(depth)) + geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3)
+
+# plot with map filter
+ ggplot(ind_depth_mfilt, aes(depth)) + geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3)
+```
+
+NOTES: 
+pre-map filter - normalish distribution around ~0.3/0.4 depth. A few individual with 0 mean depth, but only a few and this is only one chromosome... 
+post-map filter - Doesn't seem to get worse - changes, but keeping only better SNPS and great it doesn't go way down... 
+
+### Proportion of missing data per individual
+
+```{r}
+# import data 
+ind_miss  <- read_delim("./VCF_QC/scaf_1_AVHBC_no_map_filt.imiss", delim = "\t",
+                        col_names = c("ind", "ndata", "nfiltered", "nmiss", "fmiss"), skip = 1)
+ind_miss_mfilt  <- read_delim("./VCF_QC/scaf_1_AVHBC_map_filt.imiss", delim = "\t",
+                        col_names = c("ind", "ndata", "nfiltered", "nmiss", "fmiss"), skip = 1)
+
+# plot without map filter
+m<-ggplot(ind_miss, aes(fmiss)) + geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3, bins=100)
+m
+m+xlim(.8, 1)
+
+# plot with map filter
+mf<-ggplot(ind_miss_mfilt, aes(fmiss)) + geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3, bins=100)
+mf
+mf+xlim(.8, 1)
+```
+
+NOTES:
+pre-mapability filter -normalish distribution, centered around 0.7; not ideal but maybe fine (one chromosome). Looks like maybe 1 individual with no or nearly no data, 13 individuals with >0.95 missingness, and a lot with more than 0.8 missingness. 
+post-mapability filter - 
+
+### Heterozygosity and inbreeding coefficient per individual
+
+```{r}
+# import data 
+ind_het <- read_delim("./VCF_QC/scaf_1_AVHBC_no_map_filt.het", delim = "\t",
+           col_names = c("ind","ho", "he", "nsites", "f"), skip = 1)
+
+ind_het_mfilt <- read_delim("./VCF_QC/scaf_1_AVHBC_map_filt.het", delim = "\t",
+           col_names = c("ind","ho", "he", "nsites", "f"), skip = 1)
+
+# plot without map filter
+ggplot(ind_het, aes(f)) + geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3, bins=60)
+
+# plot with map filter
+ggplot(ind_het_mfilt, aes(f)) + geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3, bins=60)
+```
+
+NOTES:
+pre-mapability filter - looks fine/good, mostly centered around 0 which is HWE. some maybe showing highly negative - allelic drop out? See here for where I got that idea:
+https://speciationgenomics.github.io/filtering_vcfs/
+post-mapability filter - for chrom 1 AVHBC (which together violate HWE assumptions bc multiple species etc), map filter does result in more negative values for a few individuals (on average), not totally sure what it means... BUT, I do think it is likely we have some alleleic drop out given the super low coverage data - it is tougher to be confident about rare variants, so our filtering likely removes some real rare variants along with many spurious ones. 
+
